@@ -63,8 +63,9 @@ var gulpTfs = module.exports = function(opts) {
 				gulpUtil.log('TFS result: command ' + opts.command + ' on file(s)\r\n' + gulpUtil.colors.cyan(stdout));
 			}
 			hasUnlocked = true;
-
+			cb();
 		})
+		
 	});
 };
 
