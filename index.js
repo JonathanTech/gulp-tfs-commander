@@ -32,31 +32,38 @@ var AddVSLocationToPath = function(){
 }
 var gulpTfs = module.exports = function(opts) {
 	opts = _.extend({}, defaults, opts);
-
-	var hasUnlocked = false;
+	var files = [];
+	
 	return through.obj(function(file, encoding, callback) {
-		var self = this;
+	var hasUnlocked = false;
+	var self = this;
 
 		if (!fs.existsSync(file.path)) {
+			console.log('file "' + gulpUtil.colors.cyan(file.path) + ' doesn\'t exist' );
 			this.push(file);
 			return callback();
 		}
 
 		if (hasUnlocked) {
+			console.log('file "' + gulpUtil.colors.cyan(file.path) + '" already unlocked' );
 			this.push(file);
 			return callback();
 		}
-
-		var command = utils.generateCommand(opts.tfs, opts.command + ' "' + file.path + '" ' + utils.zipParams(opts.params));
+		files.push('"'+ file.path+'"');
+		self.push(file);
+		callback();
+		
+	}, function(cb){
+		paths = files.join(' ');
+		var command = utils.generateCommand(opts.tfs, opts.command + ' '+ paths + ' ' + utils.zipParams(opts.params));
 		return exec(command, function(err, stdout, stderr) {
 			if (opts.debug) {
 				processExecResults(err, stdout, stderr);
-				utils.log('TFS result: command ' + opts.command + ' on file ' + gulpUtil.colors.cyan(stdout));
+				console.log('TFS result: command ' + opts.command + ' on file ' + gulpUtil.colors.cyan(stdout));
 			}
 			hasUnlocked = true;
-			self.push(file);
-			callback();
-		});
+
+		})
 	});
 };
 
