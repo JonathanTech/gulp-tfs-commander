@@ -39,13 +39,13 @@ var gulpTfs = module.exports = function(opts) {
 	var self = this;
 
 		if (!fs.existsSync(file.path)) {
-			utils.log('file "' + gulpUtil.colors.cyan(file.path) + ' doesn\'t exist' );
+			gulpUtil.log('file "' + gulpUtil.colors.cyan(file.path) + ' doesn\'t exist' );
 			this.push(file);
 			return callback();
 		}
 
 		if (hasUnlocked) {
-			utils.log('file "' + gulpUtil.colors.cyan(file.path) + '" already unlocked' );
+			gulpUtil.log('file "' + gulpUtil.colors.cyan(file.path) + '" already unlocked' );
 			this.push(file);
 			return callback();
 		}
@@ -59,7 +59,8 @@ var gulpTfs = module.exports = function(opts) {
 		return exec(command, function(err, stdout, stderr) {
 			if (opts.debug) {
 				processExecResults(err, stdout, stderr);
-				utils.log('TFS result: command ' + opts.command + ' on file ' + gulpUtil.colors.cyan(stdout));
+				//stdout = stdout.split('\r\n');
+				gulpUtil.log('TFS result: command ' + opts.command + ' on file(s)\r\n' + gulpUtil.colors.cyan(stdout));
 			}
 			hasUnlocked = true;
 
