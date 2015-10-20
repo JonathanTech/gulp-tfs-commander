@@ -37,23 +37,20 @@ var gulpTfs = module.exports = function(opts) {
 	return through.obj(function(file, encoding, callback) {
 		var self = this;
 
-		if (!fs.existsSync(file.path)) {
+		if (!fs.existsSync(file.path) || fs.lstatSync(file.path).isDirectory()) {
+			if (opts.debug) {
+				utils.log(gulpUtil.colors.red( 'existsSync skipped ' + file.path ));
+			}
 			this.push(file);
 			return callback();
 		}
-
-		if (hasUnlocked) {
-			this.push(file);
-			return callback();
-		}
-
 		var command = utils.generateCommand(opts.tfs, opts.command + ' "' + file.path + '" ' + utils.zipParams(opts.params));
 		return exec(command, function(err, stdout, stderr) {
 			if (opts.debug) {
 				processExecResults(err, stdout, stderr);
 				utils.log('TFS result: command ' + opts.command + ' on file ' + gulpUtil.colors.cyan(stdout));
 			}
-			hasUnlocked = true;
+			//hasUnlocked = true;
 			self.push(file);
 			callback();
 		});
@@ -125,4 +122,3 @@ _.extend(gulpTfs, {
 		return gulpTfs;
 	}
 });
-
